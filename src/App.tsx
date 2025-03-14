@@ -10,9 +10,7 @@ import Index from "./pages/Index";
 import DataViewer from "./pages/DataViewer";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
-
-// Add framer-motion for page transitions
-<lov-add-dependency>framer-motion@latest</lov-add-dependency>
+import PageTransition from "@/components/layout/PageTransition";
 
 const queryClient = new QueryClient();
 
@@ -28,10 +26,10 @@ const App = () => (
             <div className="min-h-screen">
               <AnimatePresence mode="wait">
                 <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/data-viewer" element={<DataViewer />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="*" element={<NotFound />} />
+                  <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+                  <Route path="/data-viewer" element={<PageTransition><DataViewer /></PageTransition>} />
+                  <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+                  <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
                 </Routes>
               </AnimatePresence>
             </div>
