@@ -11,6 +11,8 @@ import DataViewer from "./pages/DataViewer";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import PageTransition from "@/components/layout/PageTransition";
+import Chat from "./pages/Chat";
+import ChatButton from "@/components/layout/ChatButton";
 
 const queryClient = new QueryClient();
 
@@ -29,11 +31,13 @@ const App = () => (
                   <Route path="/" element={<PageTransition><Index /></PageTransition>} />
                   <Route path="/data-viewer" element={<PageTransition><DataViewer /></PageTransition>} />
                   <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+                  <Route path="/chat" element={<PageTransition><Chat /></PageTransition>} />
                   <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
                 </Routes>
               </AnimatePresence>
             </div>
           </main>
+          <ChatButton />
         </div>
       </BrowserRouter>
     </TooltipProvider>
