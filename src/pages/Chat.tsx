@@ -4,7 +4,6 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Textarea } from '@/components/ui/textarea';
 import { SendIcon, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import PageTransition from '@/components/layout/PageTransition';
@@ -46,18 +45,47 @@ const Chat = () => {
     setInput('');
     setIsLoading(true);
     
+    // Add thinking message
+    const thinkingId = Date.now();
+    const thinkingMessage: ChatMessageProps = {
+      content: "Thinking...",
+      type: 'bot',
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, thinkingMessage]);
+    
     try {
       const response = await ChatAPI.sendMessage(userMessage.content);
       
-      const botMessage: ChatMessageProps = {
-        content: response.answer,
-        type: 'bot',
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, botMessage]);
+      // Remove thinking message and add actual response
+      setMessages(prev => {
+        const filteredMessages = prev.filter(msg => msg.content !== "Thinking...");
+        return [
+          ...filteredMessages,
+          {
+            content: response.answer,
+            type: 'bot',
+            timestamp: new Date()
+          }
+        ];
+      });
     } catch (error) {
       console.error('Error sending message:', error);
+      
+      // Remove thinking message and add error message
+      setMessages(prev => {
+        const filteredMessages = prev.filter(msg => msg.content !== "Thinking...");
+        return [
+          ...filteredMessages,
+          {
+            content: "Sorry, I couldn't connect to the server. Please try again later.",
+            type: 'bot',
+            timestamp: new Date()
+          }
+        ];
+      });
+      
       toast.error('Failed to get a response. Please try again.');
     } finally {
       setIsLoading(false);
@@ -86,10 +114,10 @@ const Chat = () => {
                     timestamp={message.timestamp}
                   />
                 ))}
-                {isLoading && (
+                {isLoading && !messages.some(msg => msg.content === "Thinking...") && (
                   <div className="flex items-center space-x-2 text-muted-foreground ml-10">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Thinking...</span>
+                    <span>Connecting to API...</span>
                   </div>
                 )}
               </div>
