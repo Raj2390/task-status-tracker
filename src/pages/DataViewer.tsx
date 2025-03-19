@@ -9,8 +9,7 @@ import FilterBar from '@/components/DataTable/FilterBar';
 import DataGrid from '@/components/DataTable/DataGrid';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Database, Filter, TableProperties, ChevronRight, ChevronDown, FolderTree } from 'lucide-react';
-import DataTreeNav from '@/components/DataTree/DataTreeNav';
+import { Database, Filter, TableProperties } from 'lucide-react';
 
 const DataViewer = () => {
   const [flows, setFlows] = useState<Flow[]>([]);
@@ -22,6 +21,12 @@ const DataViewer = () => {
   const [viewType, setViewType] = useState<'table' | 'cards'>('table');
   const [selectedLevel1, setSelectedLevel1] = useState<string | null>(null);
   const [selectedLevel2, setSelectedLevel2] = useState<string | null>(null);
+  
+  // This function will be called from the Sidebar component when a tree item is selected
+  window.handleTreeSelection = (level1: string, level2: string) => {
+    setSelectedLevel1(level1);
+    setSelectedLevel2(level2);
+  };
   
   useEffect(() => {
     const fetchFlows = async () => {
@@ -130,11 +135,6 @@ const DataViewer = () => {
     label: col.label
   }));
 
-  const handleTreeSelection = (level1: string, level2: string) => {
-    setSelectedLevel1(level1);
-    setSelectedLevel2(level2);
-  };
-
   return (
     <PageTransition>
       <div className="container py-8 px-4 w-full max-w-7xl mx-auto">
@@ -145,25 +145,7 @@ const DataViewer = () => {
           </p>
         </header>
         
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Tree Navigation Panel */}
-          <div className="w-full md:w-64 shrink-0">
-            <Card className="h-full">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center text-lg">
-                  <FolderTree className="h-5 w-5 mr-2" />
-                  Data Categories
-                </CardTitle>
-                <CardDescription>
-                  Navigate through data
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <DataTreeNav onSelect={handleTreeSelection} />
-              </CardContent>
-            </Card>
-          </div>
-          
+        <div className="flex flex-col">
           {/* Main Content */}
           <div className="flex-1">
             <div className="mb-8">
