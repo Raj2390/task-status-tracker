@@ -9,7 +9,9 @@ import FilterBar from '@/components/DataTable/FilterBar';
 import DataGrid from '@/components/DataTable/DataGrid';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Database, Filter, TableProperties } from 'lucide-react';
+import { Database, Filter, TableProperties, FolderOpen, ChevronRight } from 'lucide-react';
+import DataTreeNav from '@/components/DataTree/DataTreeNav';
+import { cn } from '@/lib/utils';
 
 const DataViewer = () => {
   const [flows, setFlows] = useState<Flow[]>([]);
@@ -21,9 +23,19 @@ const DataViewer = () => {
   const [viewType, setViewType] = useState<'table' | 'cards'>('table');
   const [selectedLevel1, setSelectedLevel1] = useState<string | null>(null);
   const [selectedLevel2, setSelectedLevel2] = useState<string | null>(null);
+  const [expandedTree, setExpandedTree] = useState(true);
   
   // This function will be called from the Sidebar component when a tree item is selected
   window.handleTreeSelection = (level1: string, level2: string) => {
+    setSelectedLevel1(level1);
+    setSelectedLevel2(level2);
+  };
+
+  const toggleTree = () => {
+    setExpandedTree(!expandedTree);
+  };
+  
+  const handleTreeSelect = (level1: string, level2: string) => {
     setSelectedLevel1(level1);
     setSelectedLevel2(level2);
   };
@@ -138,14 +150,32 @@ const DataViewer = () => {
   return (
     <PageTransition>
       <div className="container py-8 px-4 w-full max-w-7xl mx-auto">
-        <header className="mb-10">
+        <header className="mb-6">
           <h1 className="text-4xl font-bold tracking-tight">Data Viewer</h1>
           <p className="text-lg text-muted-foreground mt-2">
             View and filter extracted data
           </p>
         </header>
         
-        <div className="flex flex-col">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Data Categories sidebar */}
+          <aside className="w-full lg:w-64 shrink-0">
+            <Card className="h-full">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center text-lg">
+                  <FolderOpen className="h-5 w-5 mr-2" />
+                  Data Categories
+                </CardTitle>
+                <CardDescription>
+                  Browse available data categories
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DataTreeNav onSelect={handleTreeSelect} />
+              </CardContent>
+            </Card>
+          </aside>
+          
           {/* Main Content */}
           <div className="flex-1">
             <div className="mb-8">

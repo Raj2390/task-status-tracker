@@ -3,10 +3,9 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Menu, X, Home, Database, BarChart3, Info, 
-  ChevronRight, ChevronLeft, FolderOpen
+  ChevronRight, ChevronLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import DataTreeNav from '@/components/DataTree/DataTreeNav';
 
 interface SidebarProps {
   className?: string;
@@ -15,7 +14,6 @@ interface SidebarProps {
 const Sidebar = ({ className }: SidebarProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [expandedTree, setExpandedTree] = useState(false);
   const location = useLocation();
   
   // Close mobile sidebar when route changes
@@ -39,22 +37,11 @@ const Sidebar = ({ className }: SidebarProps) => {
     setCollapsed(!collapsed);
   };
 
-  const toggleTree = () => {
-    setExpandedTree(!expandedTree);
-  };
-
-  const handleTreeSelect = (level1: string, level2: string) => {
-    // This will be used when user selects an item from the tree
-    console.log(`Selected ${level1} > ${level2}`);
-  };
-
   const navItems = [
     { name: 'Home', path: '/', icon: Home },
     { name: 'Data Viewer', path: '/data-viewer', icon: Database },
     { name: 'About', path: '/about', icon: Info },
   ];
-
-  const isDataViewerActive = location.pathname === '/data-viewer';
 
   return (
     <>
@@ -133,31 +120,6 @@ const Sidebar = ({ className }: SidebarProps) => {
                 );
               })}
             </ul>
-
-            {/* Data Tree section - only visible when on Data Viewer and sidebar not collapsed */}
-            {isDataViewerActive && !collapsed && (
-              <div className="mt-6 px-2">
-                <button
-                  onClick={toggleTree}
-                  className="flex items-center w-full py-2 px-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 rounded-md"
-                >
-                  <FolderOpen className="h-4 w-4 mr-2 text-sidebar-foreground" />
-                  <span>Data Categories</span>
-                  <ChevronRight
-                    className={cn(
-                      "ml-auto h-4 w-4 text-sidebar-foreground transition-transform",
-                      expandedTree && "transform rotate-90"
-                    )}
-                  />
-                </button>
-                
-                {expandedTree && (
-                  <div className="mt-2 pl-2 pr-1 py-2 max-h-[70vh] overflow-y-auto">
-                    <DataTreeNav onSelect={handleTreeSelect} />
-                  </div>
-                )}
-              </div>
-            )}
           </nav>
 
           {/* Footer */}
