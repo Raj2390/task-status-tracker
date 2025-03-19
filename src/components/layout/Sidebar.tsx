@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Menu, X, Home, Database, BarChart3, Info, 
-  ChevronRight, ChevronLeft
+  ChevronRight, ChevronLeft, ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import DataTreeNav from '../DataTree/DataTreeNav';
 
 interface SidebarProps {
   className?: string;
@@ -14,6 +15,7 @@ interface SidebarProps {
 const Sidebar = ({ className }: SidebarProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [dataViewerExpanded, setDataViewerExpanded] = useState(false);
   const location = useLocation();
   
   // Close mobile sidebar when route changes
@@ -33,13 +35,30 @@ const Sidebar = ({ className }: SidebarProps) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Auto expand Data Viewer submenu when on the data-viewer page
+  useEffect(() => {
+    if (location.pathname === '/data-viewer') {
+      setDataViewerExpanded(true);
+    }
+  }, [location.pathname]);
+
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
   };
 
+  const toggleDataViewer = () => {
+    setDataViewerExpanded(!dataViewerExpanded);
+  };
+
+  const handleCategorySelect = (level1: string, level2: string) => {
+    // Notify the DataViewer component if it's listening
+    if (window.handleTreeSelection) {
+      window.handleTreeSelection(level1, level2);
+    }
+  };
+
   const navItems = [
     { name: 'Home', path: '/', icon: Home },
-    { name: 'Data Viewer', path: '/data-viewer', icon: Database },
     { name: 'About', path: '/about', icon: Info },
   ];
 
@@ -119,6 +138,60 @@ const Sidebar = ({ className }: SidebarProps) => {
                   </li>
                 );
               })}
+              
+              {/* Data Viewer with submenu */}
+              <li>
+                <div className="flex flex-col">
+                  <div 
+                    className={cn(
+                      "flex items-center py-2 px-4 text-sm transition-all duration-200 cursor-pointer",
+                      location.pathname === '/data-viewer' 
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
+                        : "hover:bg-sidebar-accent/50 text-sidebar-foreground",
+                      collapsed && "justify-center px-0"
+                    )}
+                  >
+                    <Link
+                      to="/data-viewer"
+                      className="flex items-center flex-1"
+                    >
+                      <Database 
+                        size={20} 
+                        className={cn(
+                          "transition-all duration-200",
+                          location.pathname === '/data-viewer' ? "text-sidebar-primary" : "text-sidebar-foreground",
+                          !collapsed && "mr-3"
+                        )} 
+                      />
+                      {!collapsed && <span>Data Viewer</span>}
+                    </Link>
+                    {!collapsed && (
+                      <button 
+                        onClick={toggleDataViewer}
+                        className="ml-auto text-sidebar-foreground"
+                      >
+                        <ChevronDown 
+                          size={16} 
+                          className={cn(
+                            "transition-transform",
+                            dataViewerExpanded ? "rotate-180" : ""
+                          )}
+                        />
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Data Categories Tree Menu */}
+                  {!collapsed && dataViewerExpanded && (
+                    <div className="ml-6 mt-1 pl-2 border-l border-sidebar-border">
+                      <div className="text-xs font-medium text-sidebar-foreground/70 mb-1 ml-2">
+                        Data Categories
+                      </div>
+                      <DataTreeNav onSelect={handleCategorySelect} />
+                    </div>
+                  )}
+                </div>
+              </li>
             </ul>
           </nav>
 
