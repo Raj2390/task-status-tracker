@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 
 // Types for our API
@@ -96,6 +97,59 @@ const mockExtractedData = {
   ]
 };
 
+// Mock data for hierarchical categories
+const mockCategoryData = {
+  'Sales Data': {
+    'Quarterly Reports': [
+      { id: 1, reportName: 'Q1 2023', revenue: 125000, growth: '5.2%', topProduct: 'Product A' },
+      { id: 2, reportName: 'Q2 2023', revenue: 142000, growth: '13.6%', topProduct: 'Product B' },
+      { id: 3, reportName: 'Q3 2023', revenue: 138000, growth: '-2.8%', topProduct: 'Product A' }
+    ],
+    'Annual Reports': [
+      { id: 1, reportName: 'Annual 2022', revenue: 510000, growth: '12.1%', departments: 5, highlights: 'Regional expansion' },
+      { id: 2, reportName: 'Annual 2021', revenue: 455000, growth: '8.3%', departments: 4, highlights: 'New product line' }
+    ],
+    'Sales Forecasts': [
+      { id: 1, quarter: 'Q4 2023', projectedRevenue: 150000, confidence: '85%', keyFactors: 'Holiday season' },
+      { id: 2, quarter: 'Q1 2024', projectedRevenue: 130000, confidence: '72%', keyFactors: 'New product launch' }
+    ]
+  },
+  'Customer Data': {
+    'Customer Profiles': [
+      { id: 1, segment: 'Enterprise', avgSpend: 75000, retention: '92%', growthOpportunity: 'Upselling' },
+      { id: 2, segment: 'SMB', avgSpend: 12000, retention: '78%', growthOpportunity: 'Service packages' },
+      { id: 3, segment: 'Startup', avgSpend: 3000, retention: '65%', growthOpportunity: 'Education' }
+    ],
+    'Demographics': [
+      { id: 1, region: 'North America', customers: 1200, avgAge: 42, topIndustry: 'Technology' },
+      { id: 2, region: 'Europe', customers: 850, avgAge: 39, topIndustry: 'Finance' },
+      { id: 3, region: 'Asia', customers: 650, avgAge: 35, topIndustry: 'Manufacturing' }
+    ],
+    'Customer Feedback': [
+      { id: 1, source: 'Survey', sentiment: 'Positive', score: 4.2, topRequest: 'Mobile features' },
+      { id: 2, source: 'Support tickets', sentiment: 'Neutral', score: 3.1, topRequest: 'Documentation' },
+      { id: 3, source: 'Social media', sentiment: 'Mixed', score: 3.8, topRequest: 'Integrations' }
+    ]
+  },
+  'Product Data': {
+    'Inventory Status': [
+      { id: 1, product: 'Product A', stock: 521, reorderPoint: 100, supplier: 'Supplier X' },
+      { id: 2, product: 'Product B', stock: 283, reorderPoint: 75, supplier: 'Supplier Y' },
+      { id: 3, product: 'Product C', stock: 56, reorderPoint: 50, supplier: 'Supplier Z' }
+    ],
+    'Product Performance': [
+      { id: 1, product: 'Product A', monthlySales: 320, returns: '2.1%', satisfaction: '94%' },
+      { id: 2, product: 'Product B', monthlySales: 150, returns: '4.5%', satisfaction: '87%' },
+      { id: 3, product: 'Product C', monthlySales: 90, returns: '1.2%', satisfaction: '96%' }
+    ],
+    'Product Lifecycle': [
+      { id: 1, product: 'Product A', stage: 'Maturity', monthsActive: 18, nextAction: 'Feature enhancement' },
+      { id: 2, product: 'Product B', stage: 'Growth', monthsActive: 8, nextAction: 'Market expansion' },
+      { id: 3, product: 'Product D', stage: 'Introduction', monthsActive: 2, nextAction: 'User feedback' }
+    ]
+  }
+};
+
 // API class
 export class API {
   static async getFlows(): Promise<Flow[]> {
@@ -155,13 +209,36 @@ export class API {
   static async getExtractedData(flowId: string, filters?: DataFilter[]): Promise<any[]> {
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    // Get the mock data for this flow
+    // Check if this is a level-based query
+    const level1Filter = filters?.find(f => f.field === 'level1');
+    const level2Filter = filters?.find(f => f.field === 'level2');
+    
+    if (level1Filter?.value && level2Filter?.value) {
+      // Return category-based data
+      const level1 = level1Filter.value.toString();
+      const level2 = level2Filter.value.toString();
+      
+      // Check if we have data for these categories
+      if (mockCategoryData[level1] && mockCategoryData[level1][level2]) {
+        return mockCategoryData[level1][level2];
+      }
+      
+      // If no specific category data, return empty array
+      return [];
+    }
+    
+    // Get the mock data for this flow (original behavior)
     const data = mockExtractedData[flowId as keyof typeof mockExtractedData] || [];
     
     // Apply filters if provided
     if (filters && filters.length > 0) {
       return data.filter(item => {
         return filters.every(filter => {
+          // Skip our special level filters
+          if (filter.field === 'level1' || filter.field === 'level2') {
+            return true;
+          }
+          
           const fieldValue = item[filter.field];
           
           switch (filter.operator) {
