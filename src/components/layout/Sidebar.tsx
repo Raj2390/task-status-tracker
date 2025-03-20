@@ -85,7 +85,7 @@ const Sidebar = ({ className }: SidebarProps) => {
       <div
         className={cn(
           "fixed top-0 left-0 h-full bg-sidebar text-sidebar-foreground z-20 transition-all duration-300 ease-in-out",
-          collapsed ? "w-[5%]" : "w-[20%]", // Changed from fixed width to percentage
+          collapsed ? "w-[5%]" : "w-[20%]",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           className
         )}
@@ -122,11 +122,11 @@ const Sidebar = ({ className }: SidebarProps) => {
                         isActive 
                           ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
                           : "hover:bg-sidebar-accent/50 text-sidebar-foreground",
-                        collapsed && "justify-center px-0"
+                        collapsed && "justify-center px-2" // Changed px-0 to px-2 for better spacing when collapsed
                       )}
                     >
                       <item.icon 
-                        size={20} 
+                        size={collapsed ? 24 : 20} // Slightly larger icons when collapsed
                         className={cn(
                           "transition-all duration-200",
                           isActive ? "text-sidebar-primary" : "text-sidebar-foreground",
@@ -148,7 +148,7 @@ const Sidebar = ({ className }: SidebarProps) => {
                       location.pathname === '/data-viewer' 
                         ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
                         : "hover:bg-sidebar-accent/50 text-sidebar-foreground",
-                      collapsed && "justify-center px-0"
+                      collapsed && "justify-center px-2" // Changed px-0 to px-2 for better spacing when collapsed
                     )}
                   >
                     <Link
@@ -156,7 +156,7 @@ const Sidebar = ({ className }: SidebarProps) => {
                       className="flex items-center flex-1"
                     >
                       <Database 
-                        size={20} 
+                        size={collapsed ? 24 : 20} // Slightly larger icons when collapsed
                         className={cn(
                           "transition-all duration-200",
                           location.pathname === '/data-viewer' ? "text-sidebar-primary" : "text-sidebar-foreground",
