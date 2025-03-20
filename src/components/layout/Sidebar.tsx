@@ -85,7 +85,7 @@ const Sidebar = ({ className }: SidebarProps) => {
       <div
         className={cn(
           "fixed top-0 left-0 h-full bg-sidebar text-sidebar-foreground z-20 transition-all duration-300 ease-in-out",
-          collapsed ? "w-16" : "w-64",
+          collapsed ? "w-[5%]" : "w-[20%]", // Changed from fixed width to percentage
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           className
         )}

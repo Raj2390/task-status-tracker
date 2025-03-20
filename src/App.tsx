@@ -24,7 +24,7 @@ const App = () => (
       <BrowserRouter>
         <div className="min-h-screen flex w-full bg-pattern">
           <Sidebar />
-          <main className="flex-1 pl-0 lg:pl-64 transition-all duration-300">
+          <main className="flex-1 pl-0 lg:pl-[20%] transition-all duration-300">
             <div className="min-h-screen">
               <AnimatePresence mode="wait">
                 <Routes>
