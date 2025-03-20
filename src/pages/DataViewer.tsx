@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { API, Flow, DataFilter } from '@/services/api';
 import PageTransition from '@/components/layout/PageTransition';
@@ -8,8 +9,7 @@ import FilterBar from '@/components/DataTable/FilterBar';
 import DataGrid from '@/components/DataTable/DataGrid';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Database, Filter, TableProperties, FolderOpen, ChevronRight } from 'lucide-react';
-import DataTreeNav from '@/components/DataTree/DataTreeNav';
+import { Database, Filter, TableProperties } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const DataViewer = () => {
@@ -22,18 +22,8 @@ const DataViewer = () => {
   const [viewType, setViewType] = useState<'table' | 'cards'>('table');
   const [selectedLevel1, setSelectedLevel1] = useState<string | null>(null);
   const [selectedLevel2, setSelectedLevel2] = useState<string | null>(null);
-  const [expandedTree, setExpandedTree] = useState(true);
   
   window.handleTreeSelection = (level1: string, level2: string) => {
-    setSelectedLevel1(level1);
-    setSelectedLevel2(level2);
-  };
-
-  const toggleTree = () => {
-    setExpandedTree(!expandedTree);
-  };
-  
-  const handleTreeSelect = (level1: string, level2: string) => {
     setSelectedLevel1(level1);
     setSelectedLevel2(level2);
   };
@@ -194,51 +184,34 @@ const DataViewer = () => {
             </div>
           </GlassCard>
           
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-            <Card className="lg:col-span-1">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center text-lg">
-                  <FolderOpen className="h-5 w-5 mr-2" />
-                  Data Categories
-                </CardTitle>
-                <CardDescription>
-                  Browse available categories
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <DataTreeNav onSelect={handleTreeSelect} />
-              </CardContent>
-            </Card>
-
-            <Card className="lg:col-span-3">
-              {selectedFlowId && columns.length > 0 ? (
-                <>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center">
-                      <Filter className="h-5 w-5 mr-2" />
-                      Filters
-                    </CardTitle>
-                    <CardDescription>
-                      Filter the data to find specific information
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <FilterBar fields={filterFields} onApplyFilters={handleApplyFilters} />
-                  </CardContent>
-                </>
-              ) : (
-                <CardContent className="py-8">
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <Filter className="h-10 w-10 text-muted stroke-1 mb-3" />
-                    <h3 className="text-lg font-medium">Select a data source</h3>
-                    <p className="text-muted-foreground mt-1 max-w-md">
-                      Choose a data flow from the dropdown above to view filtering options
-                    </p>
-                  </div>
+          <Card className="mb-6">
+            {selectedFlowId && columns.length > 0 ? (
+              <>
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center">
+                    <Filter className="h-5 w-5 mr-2" />
+                    Filters
+                  </CardTitle>
+                  <CardDescription>
+                    Filter the data to find specific information
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <FilterBar fields={filterFields} onApplyFilters={handleApplyFilters} />
                 </CardContent>
-              )}
-            </Card>
-          </div>
+              </>
+            ) : (
+              <CardContent className="py-8">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <Filter className="h-10 w-10 text-muted stroke-1 mb-3" />
+                  <h3 className="text-lg font-medium">Select a data source</h3>
+                  <p className="text-muted-foreground mt-1 max-w-md">
+                    Choose a data flow from the dropdown above to view filtering options
+                  </p>
+                </div>
+              </CardContent>
+            )}
+          </Card>
         </div>
             
         {dataLoading ? (

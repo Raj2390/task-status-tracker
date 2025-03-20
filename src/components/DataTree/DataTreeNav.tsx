@@ -96,7 +96,8 @@ const DataTreeNav = ({ onSelect }: DataTreeNavProps) => {
                       onClick={() => handleLevel2Click(level1.id, level2.id)}
                       className={cn(
                         "py-1 px-2 rounded-md hover:bg-muted text-xs w-full text-left flex items-center",
-                        selectedLevel1 === level1.id && selectedLevel2 === level2.id && "bg-muted font-medium"
+                        selectedLevel1 === level1.id && selectedLevel2 === level2.id && 
+                          "bg-primary/10 text-primary font-medium" // Changed from bg-muted to bg-primary/10 and added text-primary
                       )}
                     >
                       <FileText className="h-3 w-3 mr-1.5 text-muted-foreground" />
