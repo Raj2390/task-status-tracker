@@ -9,8 +9,9 @@ import FilterBar from '@/components/DataTable/FilterBar';
 import DataGrid from '@/components/DataTable/DataGrid';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Database, Filter, TableProperties } from 'lucide-react';
+import { Database, Filter, TableProperties, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 const DataViewer = () => {
   const [flows, setFlows] = useState<Flow[]>([]);
@@ -22,10 +23,15 @@ const DataViewer = () => {
   const [viewType, setViewType] = useState<'table' | 'cards'>('table');
   const [selectedLevel1, setSelectedLevel1] = useState<string | null>(null);
   const [selectedLevel2, setSelectedLevel2] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0); // Add a refresh key for forcing re-renders
   
+  // Define the global tree selection handler function
   window.handleTreeSelection = (level1: string, level2: string) => {
+    console.log(`Tree selection changed: ${level1} > ${level2}`);
     setSelectedLevel1(level1);
     setSelectedLevel2(level2);
+    // Force a re-render of the data panel
+    setRefreshKey(prev => prev + 1);
   };
   
   useEffect(() => {
@@ -47,13 +53,14 @@ const DataViewer = () => {
     fetchFlows();
   }, []);
   
+  // Updated to include refreshKey in dependencies array
   useEffect(() => {
     if (selectedFlowId && selectedLevel1 && selectedLevel2) {
       fetchDataWithLevels();
     } else if (selectedFlowId) {
       fetchData();
     }
-  }, [selectedFlowId, selectedLevel1, selectedLevel2]);
+  }, [selectedFlowId, selectedLevel1, selectedLevel2, refreshKey]);
   
   const fetchData = async (filters?: DataFilter[]) => {
     if (!selectedFlowId) return;
@@ -122,6 +129,11 @@ const DataViewer = () => {
       fetchData(filters);
     }
   };
+
+  // New handler for manual refresh
+  const handleRefresh = () => {
+    setRefreshKey(prev => prev + 1);
+  };
   
   const filterFields = columns.map(col => ({
     id: col.id,
@@ -131,11 +143,26 @@ const DataViewer = () => {
   return (
     <PageTransition>
       <div className="container py-8 px-4 w-full max-w-7xl mx-auto">
-        <header className="mb-6">
-          <h1 className="text-4xl font-bold tracking-tight">Data Viewer</h1>
-          <p className="text-lg text-muted-foreground mt-2">
-            View and filter extracted data
-          </p>
+        <header className="mb-6 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight">Data Viewer</h1>
+            <p className="text-lg text-muted-foreground mt-2">
+              View and filter extracted data
+            </p>
+          </div>
+          
+          {/* Add refresh button */}
+          {(selectedLevel1 && selectedLevel2) && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleRefresh}
+              className="flex items-center gap-1"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Refresh Data
+            </Button>
+          )}
         </header>
 
         <div className="mb-8">

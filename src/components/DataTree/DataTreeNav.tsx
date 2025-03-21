@@ -1,8 +1,9 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ChevronRight, FolderOpen, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLocation } from 'react-router-dom';
 
 // Mock data for the tree structure
 const treeData = [
@@ -43,6 +44,15 @@ const DataTreeNav = ({ onSelect }: DataTreeNavProps) => {
   const [selectedLevel1, setSelectedLevel1] = useState<string | null>(null);
   const [selectedLevel2, setSelectedLevel2] = useState<string | null>(null);
   const [expandedLevel1, setExpandedLevel1] = useState<string | null>(null);
+  const location = useLocation();
+
+  // Reset selections when navigating away from DataViewer page
+  useEffect(() => {
+    if (location.pathname !== '/data-viewer') {
+      setSelectedLevel1(null);
+      setSelectedLevel2(null);
+    }
+  }, [location.pathname]);
 
   const handleLevel1Click = (level1Id: string) => {
     setExpandedLevel1(expandedLevel1 === level1Id ? null : level1Id);
@@ -50,19 +60,24 @@ const DataTreeNav = ({ onSelect }: DataTreeNavProps) => {
   };
 
   const handleLevel2Click = (level1Id: string, level2Id: string) => {
-    setSelectedLevel1(level1Id);
-    setSelectedLevel2(level2Id);
-    
-    // Get the labels instead of IDs for display purposes
+    // Find the corresponding labels
     const level1Item = treeData.find(item => item.id === level1Id);
     const level2Item = level1Item?.children.find(child => child.id === level2Id);
     
-    // Notify both local component and global handler
-    onSelect(level1Item?.label || level1Id, level2Item?.label || level2Id);
+    const level1Label = level1Item?.label || level1Id;
+    const level2Label = level2Item?.label || level2Id;
     
-    // Also notify the DataViewer component
+    // Update local state
+    setSelectedLevel1(level1Id);
+    setSelectedLevel2(level2Id);
+    
+    // Notify parent component
+    onSelect(level1Label, level2Label);
+    
+    // Also notify the DataViewer component via global handler
     if (window.handleTreeSelection) {
-      window.handleTreeSelection(level1Item?.label || level1Id, level2Item?.label || level2Id);
+      console.log(`Triggering global handler with: ${level1Label} > ${level2Label}`);
+      window.handleTreeSelection(level1Label, level2Label);
     }
   };
 
@@ -97,7 +112,7 @@ const DataTreeNav = ({ onSelect }: DataTreeNavProps) => {
                       className={cn(
                         "py-1 px-2 rounded-md hover:bg-muted text-xs w-full text-left flex items-center",
                         selectedLevel1 === level1.id && selectedLevel2 === level2.id && 
-                          "bg-primary/10 text-primary font-medium" // Changed from bg-muted to bg-primary/10 and added text-primary
+                          "bg-primary/10 text-primary font-medium"
                       )}
                     >
                       <FileText className="h-3 w-3 mr-1.5 text-muted-foreground" />
